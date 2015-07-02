@@ -8,14 +8,17 @@ donors = {
 def mailroom():
     print("Welcome to Mailroom Madness\nChoose from the following:")
 
-    user_input = input("T - send a (T)hank You   R - create a (R)eport \nquit - Quit\
- the program \n")
+    user_input = input("T - send a (T)hank You   R - create a (R)eport \nC - (C)reate file\
+    quit - Quit the program \n")
+
     if user_input == 't':
             thanks()
     elif user_input == 'r':
             report()
     elif user_input == 'quit':
             return
+    elif user_input == 'c':
+            create_thankyou_file()
 
 
 def thanks():
@@ -45,7 +48,6 @@ def donation_amount(name):
         donation = int(donation)
         if int(donation) > 0:
             donors[name] = [donation]
-            print(donors)
 
             print("\nDear " + name + ",\n\nThank you so much for your kind \
 donation of $" + str(donation) + ". We here at the Foundation for \
@@ -70,6 +72,19 @@ def report():
 
         print("%s\t\t | %i \t | %i | %i" % (name, total_donated, times_donated,
               avg_donation))
+
+
+def create_thankyou_file():
+    for (donor, donations) in donors.items():
+        name = donor
+        donations = sum(donations)
+        thanks = "\nDear " + name + ",\n\nThank you so much for your kind \
+donation of $" + str(donations) + ". We here at the Foundation for \
+the Needy greatly appreciate it. Your money will go towards hel\
+ping the needy.\n\nThanks again, \n\nThe Needy\n"
+        outfile = open("thank_you_" + name + ".txt", "w")
+        outfile.write(thanks)
+        outfile.close()
 
 if __name__ == "__main__":
     mailroom()
