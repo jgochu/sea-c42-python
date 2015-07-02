@@ -20,3 +20,5 @@ trigrams = {}
 for(i, word) in enumerate(text):
     if i in range(len(text) - 2):
         trigrams[(text[i], text[i + 1])] = [text[i + 2]]
+
+print(trigrams)
