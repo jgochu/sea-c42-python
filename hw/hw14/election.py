@@ -34,8 +34,13 @@ def state_edges(election_result_rows):
     The input list has no duplicate *States*;
     that is, each *State* is represented at most once in the input list.
     """
-    #TODO: Implement this function
-    pass
+    d = {}
+    for row in election_result_rows:
+        state = row['State']
+        dem = row['Dem']
+        rep = row['Rep']
+        d[state] = float(dem) - float(rep)
+    return d
 
 
 ################################################################################
@@ -54,9 +59,24 @@ def most_recent_poll_row(poll_rows, pollster, state):
     Given a list of *PollDataRow*s, returns the most recent row with the
     specified *Pollster* and *State*. If no such row exists, returns None.
     """
-    #TODO: Implement this function
-    pass
+    d = {}
 
+    for i in range(len(poll_rows)):
+        if pollster != poll_rows[i]['Pollster'] or state != poll_rows[i]['State']:
+            return None
+        else:
+            x = i + 1
+            if pollster in poll_rows[i]['Pollster'] and state in poll_rows[i]['State']:
+                if not earlier_date(poll_rows[i]['Date'], poll_rows[x]['Date']):
+                    date = poll_rows[i]['Date']
+                    ids = poll_rows[i]["ID"]
+                    state = poll_rows[i]['State']
+                    pollster = poll_rows[i]['Pollster']
+                    d = {'ID': ids, 'State': state, 'Pollster': pollster,
+                       'Date': date}
+                    return d
+                else:
+                    continue
 
 ################################################################################
 # Problem 3: Pollster predictions
@@ -67,14 +87,18 @@ def unique_column_values(rows, column_name):
     Given a list of rows and the name of a column (a string),
     returns a set containing all values in that column.
     """
-    #TODO: Implement this function
-    pass
+    ucv = set()
+    for i in rows:
+        ucv.update([i[column_name]])
+    return ucv
 
 def pollster_predictions(poll_rows):
     """
     Given a list of *PollDataRow*s, returns *PollsterPredictions*.
     For a given pollster, uses only the most recent poll for a state.
     """
+
+
     #TODO: Implement this function
     pass
 
