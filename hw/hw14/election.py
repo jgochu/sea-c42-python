@@ -98,9 +98,11 @@ def pollster_predictions(poll_rows):
     For a given pollster, uses only the most recent poll for a state.
     """
 
+    d = {}
 
+    for i in range(len(poll_rows)):
     #TODO: Implement this function
-    pass
+        pass
 
 
 ################################################################################
@@ -112,16 +114,28 @@ def average_error(state_edges_predicted, state_edges_actual):
     Given predicted *StateEdges* and actual *StateEdges*, returns
     the average error of the prediction.
     """
-    #TODO: Implement this function
-    pass
+    count = 0
+    x = 0
+    for state in state_edges_predicted:
+        if state in state_edges_actual:
+            x = x + abs(state_edges_predicted[state] - state_edges_actual[state])
+            count += 1
+    return(x / count)
+
 
 def pollster_errors(pollster_predictions, state_edges_actual):
     """
     Given *PollsterPredictions* and actual *StateEdges*,
     retuns *PollsterErrors*.
     """
+    d = {}
+    for poll in pollster_predictions:
+        x = average_error(pollster_predictions[poll], state_edges_actual)
+        d.update({poll: x})
+    return d
+
     #TODO: Implement this function
-    pass
+    #pass
 
 
 ################################################################################
