@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import random
+import string
 
 open_file = open('sherlock.txt', 'r')
 text = open_file.read()
@@ -7,12 +8,16 @@ text = open_file.read()
 open_file.close()
 
 #  remove unwanted characters
-for char in ["\\", '(', ')', '-', '.', ';']:
-    if char in text:
-        text = text.replace(char, '')
-for char in ['\n', '--', '-']:
+punc = string.punctuation
+punc = punc.replace("'", "")  # keep apostropies
+punc = punc.replace("-", "")  # keep hyphenated words
+
+for char in ['\n', '--']:
     if char in text:
         text = text.replace(char, ' ')
+for char in punc:
+    if char in text:
+        text = text.replace(char, '')
 
 text = text.split()
 
@@ -24,7 +29,7 @@ def words(text):
     #  add words to dictionary in trigrams
     for(i, word) in enumerate(text):
         if i in range(len(text) - 2):
-            trigrams[(text[i], text[i + 1])] = [text[i + 2]]
+            trigrams.setdefault((text[i], text[i + 1]), []).append(text[i + 2])
     return trigrams
 
 
