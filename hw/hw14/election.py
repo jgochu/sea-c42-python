@@ -36,10 +36,7 @@ def state_edges(election_result_rows):
     """
     d = {}
     for row in election_result_rows:
-        state = row['State']
-        dem = row['Dem']
-        rep = row['Rep']
-        d[state] = float(dem) - float(rep)
+        d[row['State']] = row_to_edge(row)
     return d
 
 
@@ -60,23 +57,17 @@ def most_recent_poll_row(poll_rows, pollster, state):
     specified *Pollster* and *State*. If no such row exists, returns None.
     """
     d = {}
+    for row in poll_rows:
+        if pollster == row['Pollster'] and state == row['State']:
+            if d == {}:
+                d = row
+            elif earlier_date(d['Date'], row['Date']):
+                d = row
+    if len(d) < 1:
+        return None
+    else:
+        return d
 
-    for i in range(len(poll_rows)):
-        if pollster != poll_rows[i]['Pollster'] or state != poll_rows[i]['State']:
-            return None
-        else:
-            x = i + 1
-            if pollster in poll_rows[i]['Pollster'] and state in poll_rows[i]['State']:
-                if not earlier_date(poll_rows[i]['Date'], poll_rows[x]['Date']):
-                    date = poll_rows[i]['Date']
-                    ids = poll_rows[i]["ID"]
-                    state = poll_rows[i]['State']
-                    pollster = poll_rows[i]['Pollster']
-                    d = {'ID': ids, 'State': state, 'Pollster': pollster,
-                       'Date': date}
-                    return d
-                else:
-                    continue
 
 ################################################################################
 # Problem 3: Pollster predictions
@@ -88,8 +79,8 @@ def unique_column_values(rows, column_name):
     returns a set containing all values in that column.
     """
     ucv = set()
-    for i in rows:
-        ucv.update([i[column_name]])
+    for row in rows:
+        ucv.update([row[column_name]])
     return ucv
 
 def pollster_predictions(poll_rows):
@@ -99,10 +90,18 @@ def pollster_predictions(poll_rows):
     """
 
     d = {}
+    pollsters = unique_column_values(poll_rows, 'Pollster')
+    states = unique_column_values(poll_rows, 'State')
+    for pollster in pollsters:
+        d[pollster] = {}
+        for state in states:
+            recent_poll = most_recent_poll_row(poll_rows, pollster, state)
+            if recent_poll is not None:
+                d[pollster][state] = row_to_edge(recent_poll)
+    return d
 
-    for i in range(len(poll_rows)):
     #TODO: Implement this function
-        pass
+       # pass
 
 
 ################################################################################
