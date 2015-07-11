@@ -13,71 +13,98 @@ class Element(object):
 
     IND_LEVEL = "    "
 
-    def __init__(self, name="", content=""):
-            self.name = name
-            self.children = [content] if content else []
+    def __init__(self, content="", **kwargs):
+        self.children = [content] if content else []
+        self.attributes = kwargs
 
     def append(self, new_child):
-            self.children.append(new_child)
+        self.children.append(new_child)
 
     def render(self, file_out, indent="    ", ):
 
-            file_out.write("%s<%s>\n" % (indent, self.name))
-            for child in self.children:
-                if (type(child) == str):
-                    # Add new content string without rendering
-                    file_out.write(indent + Element.IND_LEVEL + child)
-                else:
-                    # Add new child node, by recursively rendering
-                    child.render(file_out, indent + Element.IND_LEVEL)
-            file_out.write("%s</%s>\n" % (indent, self.name))
+        if len(self.attributes) < 1:
+            file_out.write("\n%s<%s>" % (indent, self.name))
+        else:
+            for k, v in self.attributes.items():
+                file_out.write('\n%s<%s %s="%s">' % (indent, self.name, k, v))
+
+        for child in self.children:
+            if (type(child) == str):
+                # Add new content string without rendering
+                file_out.write("\n" + indent + Element.IND_LEVEL + child)
+            else:
+                # Add new child node, by recursively rendering
+                child.render(file_out, indent + Element.IND_LEVEL)
+        file_out.write("\n%s</%s>" % (indent, self.name))
 
 
 class Html(Element):
+    name = 'html'
 
-    def __init__(self, name="", content=""):
-        Element.__init__(self, name='html', content="")
+    def __init__(self, content=""):
+        Element.__init__(self, content="")
 
     def render(self, file_out, indent=""):
-        file_out.write("<!DOCTYPE html>\n")
+        file_out.write("<!DOCTYPE html>")
         Element.render(self, file_out, "")
 
 
 class Head(Element):
-
-    def __init__(self, content=""):
-        Element.__init__(self, name='head', content="")
+    name = 'head'
 
 
 class OneLineTag(Element):
 
-    def __init__(self, content="", name=""):
+    def __init__(self, content=""):
         Element.__init__(self, content=content)
 
     def render(self, file_out, indent=""):
 
-        file_out.write("%s<%s>" % (indent, self.name))
+        if len(self.attributes) < 1:
+            file_out.write("\n%s<%s>" % (indent, self.name))
+        else:
+            for k, v in self.attributes.items():
+                file_out.write("\n%s<%s %s='%s'>" % (indent, self.name, k, v))
+
         for child in self.children:
             try:
                 child.render(file_out, self.content)
             except AttributeError:
                 file_out.write(child)
-        file_out.write("</%s>\n" % (self.name))
+        file_out.write("</%s>" % (self.name))
 
 
 class Title(OneLineTag):
-
-    def __init__(self, content=""):
-        Element.__init__(self, name='title', content=content)
+    name = 'title'
 
 
 class Body(Element):
-
-    def __init__(self, content=""):
-        Element.__init__(self, name='body', content=content)
+    name = 'body'
 
 
 class P(Element):
+    name = 'p'
 
-    def __init__(self, content=""):
-        Element.__init__(self, name='p', content=content)
+
+class SelfClosingTag(Element):
+
+    def __init__(self):
+        Element.__init__(self)
+
+    def render(self, file_out, indent=""):
+        file_out.write("\n%s<%s/>" % (indent, self.name))
+
+
+class Hr(SelfClosingTag):
+    name = 'hr'
+
+
+class Br(SelfClosingTag):
+    name = 'br'
+
+
+class A(OneLineTag):
+    name = 'a'
+
+    def __init__(self, link="", content=""):
+        Element.__init__(self, content=content, href=link)
